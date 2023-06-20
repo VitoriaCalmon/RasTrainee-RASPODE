@@ -1,0 +1,72 @@
+#define pot_vol A1
+#define alarme 4
+#define led 2
+#define bomba 9
+#define trig 5
+#define echo 6 //recebe
+int volume_real;   //formula de vazão experimental(contador)
+bool copo=0;       //distância inadequada
+int volume_des=800;//definido no app SET POINT
+int tempoAnterior =0; 
+int distancia, duracao;
+void setup()
+{
+ 
+  
+  pinMode(pot_vol, INPUT);
+  pinMode(alarme, OUTPUT);
+  pinMode(bomba, OUTPUT);
+  pinMode(led, OUTPUT);
+  pinMode(echo, INPUT);
+  pinMode(trig, OUTPUT);
+  
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  copo_on();
+  volumePot();
+  
+  Serial.print("COPO: ");
+  Serial.println(copo);
+  Serial.print("dist: ");
+  Serial.println(distancia);
+  
+  if(copo == 1){
+    
+    if(volume_real < volume_des){
+    	digitalWrite(bomba, HIGH);
+        digitalWrite(led, HIGH);     
+    }else{
+        digitalWrite(bomba, LOW);
+        digitalWrite(led, LOW);
+        tone(alarme, 261,500);
+        delay(2000);
+      	noTone(alarme);
+        copo=0;
+    }
+  }
+}
+void copo_on(){ //Ver copo por 4 segundos
+    
+    digitalWrite(trig, HIGH);
+  	delayMicroseconds(5);
+  	digitalWrite(trig, LOW);
+  	duracao= pulseIn(echo, HIGH);
+  	distancia = duracao*0.017;//converte para centrimetros
+  
+  if((distancia>=20) && (distancia<=30)){ 
+    if(millis()- tempoAnterior >= 4000){ //4segundos
+      tempoAnterior = millis();
+      copo=1;
+    }else{
+    	tempoAnterior = 0;
+    }
+  }
+}
+
+void volumePot(){
+  volume_real = analogRead(pot_vol);
+//Serial.println(volume_real);
+}
