@@ -1,0 +1,66 @@
+#define bot1 2 //200ml
+#define bomba  9
+#define bot2 3 //500ml
+#define bot3 4 //700ml
+#define buzzer 8
+#define infra 10
+#define led 6
+int tempo_vol;
+bool estado_botao1 = false, estado_botao2 = false;
+bool estado_botao3 = false, leitura_infra= 1;
+
+void setup() {
+  
+  Serial.begin(9600);
+  pinMode(bot1, INPUT_PULLUP);
+  pinMode(bomba, OUTPUT);
+  pinMode(led, OUTPUT);
+  pinMode(bot2, INPUT_PULLUP);
+  pinMode(bot3, INPUT_PULLUP);
+  pinMode(buzzer, OUTPUT);
+  pinMode(infra, INPUT); 
+}
+
+void loop() { 
+ leitura_infra = digitalRead(infra);
+ Serial.println(digitalRead(bot1));
+ //Botão apertado e infravermelho tapado
+  if((digitalRead(bot1) == 0) && (leitura_infra == 0)){ 
+    //acionado 200ML e infra detecta algo
+          tempo_vol=2500;
+          estado_botao1 = !estado_botao1;
+          delay(200);                         //tempo em milisegundos
+          digitalWrite(bomba, estado_botao1); //liga
+          delay(tempo_vol);                   //tempo de espera
+          estado_botao1 = !estado_botao1;
+          digitalWrite(bomba, estado_botao1); //desliga
+          digitalWrite(buzzer, HIGH);
+          delay(400); 
+          digitalWrite(buzzer, LOW);
+  }  
+  
+  if((digitalRead(bot2) == 0) && (leitura_infra == 0)){ //acionado 500ML
+          tempo_vol=5250;
+          estado_botao2 = !estado_botao2;
+          delay(200);
+          digitalWrite(bomba, estado_botao2); 
+          delay(tempo_vol);
+          estado_botao2 = !estado_botao2;
+          digitalWrite(bomba, estado_botao2);
+          digitalWrite(buzzer, HIGH);
+          delay(400); 
+          digitalWrite(buzzer, LOW);
+          
+  } if((digitalRead(bot3) == 0) && (leitura_infra == 0)){ //acionado 700ML
+          tempo_vol=7500;
+          estado_botao3 = !estado_botao3;
+          delay(200);
+          digitalWrite(bomba, estado_botao3); 
+          delay(tempo_vol);
+          estado_botao3 = !estado_botao3;
+          digitalWrite(bomba, estado_botao3);
+          digitalWrite(buzzer, HIGH);
+          delay(400); 
+          digitalWrite(buzzer, LOW);
+  } 
+}
